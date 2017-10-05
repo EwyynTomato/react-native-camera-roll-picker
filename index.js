@@ -32,6 +32,11 @@ class CameraRollPicker extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    if (this.props.groupName != nextProps.groupName || this.props.groupTypes != nextProps.groupTypes) {
+      this._clear();
+      this.fetch();
+    }
+
     this.setState({
       selected: nextProps.selected,
     });
@@ -43,18 +48,29 @@ class CameraRollPicker extends Component {
     }
   }
 
+  _clear() {
+    this.setState({
+        images: [],
+        dataSource: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
+    });
+  }
+
   _fetch() {
-    var {groupTypes, assetType} = this.props;
+    var {groupTypes, groupName, assetType} = this.props;
 
     var fetchParams = {
       first: 1000,
       groupTypes: groupTypes,
+      groupName: groupName,
       assetType: assetType,
     };
 
     if (Platform.OS === "android") {
       // not supported in android
       delete fetchParams.groupTypes;
+    } else {
+      // not supported in iOS
+      delete fetchParams.groupName;
     }
 
     if (this.state.lastCursor) {
@@ -266,15 +282,7 @@ CameraRollPicker.propTypes = {
   initialListSize: PropTypes.number,
   pageSize: PropTypes.number,
   removeClippedSubviews: PropTypes.bool,
-  groupTypes: PropTypes.oneOf([
-    'Album',
-    'All',
-    'Event',
-    'Faces',
-    'Library',
-    'PhotoStream',
-    'SavedPhotos',
-  ]),
+  groupTypes: PropTypes.string,
   maximum: PropTypes.number,
   assetType: PropTypes.oneOf([
     'Photos',
