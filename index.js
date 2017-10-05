@@ -51,6 +51,7 @@ class CameraRollPicker extends Component {
   _clear() {
     this.setState({
         images: [],
+        lastCursor: null,
         dataSource: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
     });
   }
